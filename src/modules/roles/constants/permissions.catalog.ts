@@ -21,6 +21,7 @@ export const PERMISSIONS_CATALOG: CatalogEntry[] = [
   // Future modules — rows exist for the permission matrix UI; no guards enforce them yet
   { module: 'services', actions: ['create', 'read', 'update', 'delete', 'publish'] },
   { module: 'concerns', actions: ['create', 'read', 'update', 'delete', 'publish'] },
+  { module: 'categories', actions: ['create', 'read', 'update', 'delete'] },
   { module: 'packages', actions: ['create', 'read', 'update', 'delete', 'publish'] },
   { module: 'doctors', actions: ['create', 'read', 'update', 'delete', 'publish'] },
   { module: 'clinics', actions: ['create', 'read', 'update', 'delete'] },

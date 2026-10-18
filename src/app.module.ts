@@ -25,6 +25,7 @@ import { DoctorsModule } from './modules/doctors/doctors.module';
 import { PackagesModule } from './modules/packages/packages.module';
 import { OffersModule } from './modules/offers/offers.module';
 import { ConcernsModule } from './modules/concerns/concerns.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 import { TestimonialsModule } from './modules/testimonials/testimonials.module';
 import { CampaignsModule } from './modules/campaigns/campaigns.module';
 import { BlogsModule } from './modules/blogs/blogs.module';
@@ -57,6 +58,7 @@ import { PageBuilderModule } from './modules/page-builder/page-builder.module';
     PackagesModule,
     OffersModule,
     ConcernsModule,
+    CategoriesModule,
     TestimonialsModule,
     CampaignsModule,
     BlogsModule,

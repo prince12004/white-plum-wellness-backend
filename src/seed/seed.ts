@@ -5,16 +5,125 @@ import { PermissionSchema, Permission } from '../modules/roles/schemas/permissio
 import { RoleSchema, Role, SYSTEM_ROLE_KEYS } from '../modules/roles/schemas/role.schema';
 import { UserSchema, User } from '../modules/users/schemas/user.schema';
 import { SettingsSchema, Settings } from '../modules/settings/schemas/settings.schema';
+import { CategorySchema, Category } from '../modules/categories/schemas/category.schema';
 import { PERMISSIONS_CATALOG, buildPermissionKey } from '../modules/roles/constants/permissions.catalog';
 
 type RoleKey = (typeof SYSTEM_ROLE_KEYS)[number];
+
+/** One-time migration of the previously-hardcoded treatment categories (from
+ * apps/web/src/data/categories.ts) into the database, so the homepage/services
+ * category grid doesn't go blank the first time this becomes admin-managed.
+ * Only runs if the categories collection is still empty — never overwrites
+ * admin edits made after the first deploy. */
+const DEFAULT_CATEGORIES = [
+  {
+    slug: 'skin',
+    name: 'Skin',
+    shortDescription: 'Acne, pigmentation, brightening & rejuvenation',
+    description:
+      'Comprehensive skin care built around your skin type and concern — from stubborn acne and pigmentation to overall brightening and rejuvenation, using clinically proven protocols.',
+    icon: 'Sparkles',
+    image: 'https://images.unsplash.com/photo-1519415387722-a1c3bbef716c?w=800&h=600&fit=crop&auto=format&q=80',
+    order: 0,
+  },
+  {
+    slug: 'hair',
+    name: 'Hair',
+    shortDescription: 'Hair fall, thinning, restoration & scalp health',
+    description:
+      'Evidence-based hair treatments spanning medical therapy, PRP, and restoration procedures, designed to address hair fall at the root cause rather than mask the symptom.',
+    icon: 'Wind',
+    image: 'https://images.unsplash.com/photo-1695527081848-1e46c06e6458?w=800&h=600&fit=crop&auto=format&q=80',
+    order: 1,
+  },
+  {
+    slug: 'laser',
+    name: 'Laser',
+    shortDescription: 'Hair removal, pigmentation & skin resurfacing',
+    description:
+      'Advanced laser platforms for permanent hair reduction, pigmentation correction, and skin resurfacing — calibrated to Indian skin tones for safe, consistent results.',
+    icon: 'Zap',
+    image: 'https://plus.unsplash.com/premium_photo-1661386084694-0523d8d1fc9e?w=800&h=600&fit=crop&auto=format&q=80',
+    order: 2,
+  },
+  {
+    slug: 'anti-ageing',
+    name: 'Anti-Ageing',
+    shortDescription: 'Botox, fillers, threads & skin tightening',
+    description:
+      'Subtle, natural-looking anti-ageing solutions — from injectables to non-surgical skin tightening — that soften fine lines without changing who you are.',
+    icon: 'Clock',
+    image: 'https://images.unsplash.com/photo-1581182815808-b6eb627a8798?w=800&h=600&fit=crop&auto=format&q=80',
+    order: 3,
+  },
+  {
+    slug: 'facial-aesthetics',
+    name: 'Facial Aesthetics',
+    shortDescription: 'Contouring, harmonisation & jawline definition',
+    description:
+      'Precision facial contouring and harmonisation procedures that enhance your natural features with a balanced, proportionate approach.',
+    icon: 'Smile',
+    image: 'https://images.unsplash.com/photo-1761718209852-54ca4210183e?w=800&h=600&fit=crop&auto=format&q=80',
+    order: 4,
+  },
+  {
+    slug: 'body',
+    name: 'Body',
+    shortDescription: 'Contouring, fat reduction & skin tightening',
+    description:
+      'Non-invasive body contouring and tightening treatments to help you achieve a more sculpted silhouette without surgery or downtime.',
+    icon: 'Activity',
+    image: 'https://images.unsplash.com/photo-1639162906614-0603b0ae95fd?w=800&h=600&fit=crop&auto=format&q=80',
+    order: 5,
+  },
+  {
+    slug: 'bridal',
+    name: 'Bridal',
+    shortDescription: 'Curated pre-bridal glow programs',
+    description:
+      'Timed pre-bridal programs combining skin, hair, and body treatments so you arrive at every function looking and feeling your absolute best.',
+    icon: 'Heart',
+    image: 'https://plus.unsplash.com/premium_photo-1667509318729-1768e9128ced?w=800&h=600&fit=crop&auto=format&q=80',
+    order: 6,
+  },
+  {
+    slug: 'aesthetic-procedures',
+    name: 'Aesthetic Procedures',
+    shortDescription: 'Advanced surgical & minimally-invasive care',
+    description:
+      'Consultant-led aesthetic procedures for patients seeking more advanced correction, always beginning with an honest, realistic assessment.',
+    icon: 'Stethoscope',
+    image: 'https://images.unsplash.com/photo-1713085085470-fba013d67e65?w=800&h=600&fit=crop&auto=format&q=80',
+    order: 7,
+  },
+  {
+    slug: 'weight-management',
+    name: 'Weight Management',
+    shortDescription: 'Medically supervised weight & wellness programs',
+    description:
+      'Structured, medically supervised weight management programs that combine nutrition guidance with body composition tracking.',
+    icon: 'TrendingDown',
+    image: 'https://images.unsplash.com/photo-1630595271375-5073a6c0638b?w=800&h=600&fit=crop&auto=format&q=80',
+    order: 8,
+  },
+  {
+    slug: 'skincare',
+    name: 'Skincare',
+    shortDescription: 'Doctor-recommended everyday skincare',
+    description:
+      'Dermatologist-formulated everyday skincare recommendations that support and extend the results of your in-clinic treatments.',
+    icon: 'Droplet',
+    image: 'https://plus.unsplash.com/premium_photo-1682096423780-41ca1b04af68?w=800&h=600&fit=crop&auto=format&q=80',
+    order: 9,
+  },
+];
 
 /** module-prefix patterns each system role is granted, matched against seeded permission keys. */
 const ROLE_MODULE_GRANTS: Record<RoleKey, { modules: string[]; actions?: string[] } | 'ALL'> = {
   SUPER_ADMIN: 'ALL',
   ADMIN: 'ALL',
   CONTENT_MANAGER: {
-    modules: ['services', 'concerns', 'packages', 'blogs', 'gallery', 'faqs', 'testimonials', 'before-after', 'doctors', 'clinics'],
+    modules: ['services', 'concerns', 'categories', 'packages', 'blogs', 'gallery', 'faqs', 'testimonials', 'before-after', 'doctors', 'clinics'],
   },
   MARKETING_MANAGER: {
     modules: ['offers', 'leads', 'campaigns', 'analytics'],
@@ -49,6 +158,7 @@ async function main() {
   const RoleModel = mongoose.model(Role.name, RoleSchema);
   const UserModel = mongoose.model(User.name, UserSchema);
   const SettingsModel = mongoose.model(Settings.name, SettingsSchema);
+  const CategoryModel = mongoose.model(Category.name, CategorySchema);
 
   // 1. Upsert the full permission catalog.
   const permissionIdsByKey = new Map<string, Types.ObjectId>();
@@ -132,6 +242,15 @@ async function main() {
     console.log('Default settings document created.');
   } else {
     console.log('Settings document already exists — leaving as is.');
+  }
+
+  // 5. Migrate the default treatment categories (only if none exist yet).
+  const existingCategoryCount = await CategoryModel.countDocuments();
+  if (existingCategoryCount === 0) {
+    await CategoryModel.insertMany(DEFAULT_CATEGORIES);
+    console.log(`Default categories seeded (${DEFAULT_CATEGORIES.length}).`);
+  } else {
+    console.log(`Categories already exist (${existingCategoryCount}) — leaving as is.`);
   }
 
   console.log('\nSeed complete.');
