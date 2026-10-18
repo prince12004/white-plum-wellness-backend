@@ -44,8 +44,13 @@ export class CustomerAuthController {
   }
 
   private clearAuthCookies(res: Response) {
-    res.clearCookie('customer_access_token', { path: '/' });
-    res.clearCookie('customer_refresh_token', { path: '/' });
+    // Must match setAuthCookies' options exactly (domain/secure/sameSite/path) —
+    // a mismatched clearing Set-Cookie header is silently ignored by the browser.
+    const isProd = this.configService.get<string>('nodeEnv') === 'production';
+    const domain = this.configService.get<string>('cookieDomain');
+
+    res.clearCookie('customer_access_token', { httpOnly: true, secure: isProd, sameSite: 'lax', domain, path: '/' });
+    res.clearCookie('customer_refresh_token', { httpOnly: true, secure: isProd, sameSite: 'lax', domain, path: '/' });
   }
 
   @Public()
