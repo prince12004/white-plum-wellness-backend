@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { CmsSectionDto } from '../../../common/dto/cms-section.dto';
 
 class HeroSlideDto {
   @IsString() eyebrow!: string;
@@ -21,4 +22,15 @@ export class UpdateHomepageContentDto {
   @IsOptional() @IsArray() @IsString({ each: true }) featuredPackageSlugs?: string[];
   @IsOptional() @IsArray() @IsString({ each: true }) featuredOfferSlugs?: string[];
   @IsOptional() @IsArray() @IsString({ each: true }) featuredTestimonialIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CmsSectionDto)
+  sections?: CmsSectionDto[];
+
+  @IsOptional() @IsString() metaTitle?: string | null;
+  @IsOptional() @IsString() metaDescription?: string | null;
+  @IsOptional() @IsString() metaKeywords?: string | null;
+  @IsOptional() @IsString() ogImage?: string | null;
 }

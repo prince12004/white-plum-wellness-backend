@@ -29,6 +29,12 @@ export class PageBuilderController {
     return this.pageBuilderService.findAllAdmin(query);
   }
 
+  @Get('admin/by-slug/:slug')
+  @RequirePermissions('page-builder:read')
+  findOneAdminBySlug(@Param('slug') slug: string) {
+    return this.pageBuilderService.findBySlugAdmin(slug);
+  }
+
   @Get('admin/:id')
   @RequirePermissions('page-builder:read')
   findOneAdmin(@Param('id') id: string) {

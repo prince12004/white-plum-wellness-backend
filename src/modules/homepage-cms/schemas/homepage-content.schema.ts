@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, HydratedDocument, Types } from 'mongoose';
+import { CmsSection, CmsSectionSchema } from '../../../common/schemas/cms-section.schema';
 
 @Schema({ _id: false })
 class HeroSlide {
@@ -48,6 +49,22 @@ export class HomepageContent extends Document {
 
   @Prop({ type: [String], default: [] })
   featuredTestimonialIds!: string[];
+
+  // No default: "never published" (undefined) must stay distinct from "every section removed" ([]).
+  @Prop({ type: [CmsSectionSchema], default: undefined })
+  sections?: CmsSection[];
+
+  @Prop({ type: String, default: null })
+  metaTitle!: string | null;
+
+  @Prop({ type: String, default: null })
+  metaDescription!: string | null;
+
+  @Prop({ type: String, default: null })
+  metaKeywords!: string | null;
+
+  @Prop({ type: String, default: null })
+  ogImage!: string | null;
 
   @Prop({ type: Types.ObjectId, ref: 'User', default: null })
   updatedBy!: Types.ObjectId | null;
