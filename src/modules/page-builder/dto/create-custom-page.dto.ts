@@ -25,4 +25,6 @@ export class CreateCustomPageDto {
   sections?: CmsSectionDto[];
 
   @IsOptional() @IsBoolean() isPublished?: boolean;
+  @IsOptional() @IsBoolean() showInHeader?: boolean;
+  @IsOptional() @IsBoolean() showInFooter?: boolean;
 }

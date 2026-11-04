@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { CmsSectionDto } from '../../../common/dto/cms-section.dto';
 
 class HeroSlideDto {
@@ -33,4 +33,6 @@ export class UpdateHomepageContentDto {
   @IsOptional() @IsString() metaDescription?: string | null;
   @IsOptional() @IsString() metaKeywords?: string | null;
   @IsOptional() @IsString() ogImage?: string | null;
+  @IsOptional() @IsString() canonicalUrl?: string | null;
+  @IsOptional() @IsBoolean() noIndex?: boolean;
 }

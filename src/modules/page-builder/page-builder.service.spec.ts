@@ -11,6 +11,13 @@ describe('PageBuilderService', () => {
     await expect(service.create({ title: 'About', slug: 'about' })).rejects.toBeInstanceOf(BadRequestException);
   });
 
+  it("refuses to change a built-in page's URL", async () => {
+    const save = jest.fn();
+    const service = makeService({ findById: jest.fn().mockResolvedValue({ systemKey: 'about', slug: 'about', save }) });
+    await expect(service.update('id', { slug: 'about-us' })).rejects.toBeInstanceOf(BadRequestException);
+    expect(save).not.toHaveBeenCalled();
+  });
+
   it('refuses to delete a system page', async () => {
     const deleteOne = jest.fn();
     const service = makeService({ findById: jest.fn().mockResolvedValue({ systemKey: 'skin-treatment', deleteOne }) });

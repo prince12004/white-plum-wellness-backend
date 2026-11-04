@@ -42,6 +42,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
       });
     }
 
+    if ((exception as { type?: string })?.type === 'entity.too.large') {
+      return response.status(HttpStatus.PAYLOAD_TOO_LARGE).json({
+        statusCode: HttpStatus.PAYLOAD_TOO_LARGE,
+        message: 'This content is too large to save. Please shorten it or split it across pages.',
+        error: 'Payload Too Large',
+        path: request.url,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     const mongoErr = exception as MongoServerErrorLike;
 
     if (mongoErr?.code === 11000) {

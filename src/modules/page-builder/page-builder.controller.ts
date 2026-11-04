@@ -23,6 +23,12 @@ export class PageBuilderController {
     return this.pageBuilderService.findAllPublic(query);
   }
 
+  @Public()
+  @Get('nav')
+  findNav() {
+    return this.pageBuilderService.findNav();
+  }
+
   @Get('admin')
   @RequirePermissions('page-builder:read')
   findAllAdmin(@Query() query: ListCustomPagesQueryDto) {

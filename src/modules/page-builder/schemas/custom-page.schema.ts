@@ -45,6 +45,12 @@ export class CustomPage extends Document {
 
   @Prop({ default: false })
   isPublished!: boolean;
+
+  @Prop({ default: false })
+  showInHeader!: boolean;
+
+  @Prop({ default: false })
+  showInFooter!: boolean;
 }
 
 export const CustomPageSchema = SchemaFactory.createForClass(CustomPage);

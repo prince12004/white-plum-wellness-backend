@@ -66,6 +66,12 @@ export class HomepageContent extends Document {
   @Prop({ type: String, default: null })
   ogImage!: string | null;
 
+  @Prop({ type: String, default: null })
+  canonicalUrl!: string | null;
+
+  @Prop({ default: false })
+  noIndex!: boolean;
+
   @Prop({ type: Types.ObjectId, ref: 'User', default: null })
   updatedBy!: Types.ObjectId | null;
 }
