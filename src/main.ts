@@ -12,6 +12,9 @@ async function bootstrap() {
 
   // CMS pages are saved as one JSON document — the 100kb default rejects long pages.
   app.useBodyParser('json', { limit: '5mb' });
+  // nginx on the same machine sets X-Forwarded-For; without this every visitor shares nginx's 127.0.0.1
+  // for rate limiting and audit logs.
+  app.set('trust proxy', 'loopback');
   app.use(helmet());
   app.use(cookieParser());
   app.enableCors({
